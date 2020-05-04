@@ -1,0 +1,32 @@
+{
+  "name": "fowler-refactoring",
+  "version": "1.0.0",
+  "description": "A collection of examples from Martin Fowler's Refactoring book.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "run": "ts-node ./theatrical-company/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michael-fearn/fowler-refactoring.git"
+  },
+  "keywords": [
+    "martin",
+    "fowler",
+    "typescript",
+    "refactoring"
+  ],
+  "author": "Michael Fearn",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/michael-fearn/fowler-refactoring/issues"
+  },
+  "homepage": "https://github.com/michael-fearn/fowler-refactoring#readme",
+  "devDependencies": {
+    "jest": "^25.5.4",
+    "ts-jest": "^25.4.0",
+    "ts-node": "^8.10.1",
+    "typescript": "^3.8.3"
+  }
+}
