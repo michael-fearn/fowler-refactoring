@@ -20,6 +20,14 @@ type Plays = {
 const invoices = invoicesRaw as Invoice[];
 const plays = playsRaw as Plays;
 
+function usd(aNumber: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumIntegerDigits: 2,
+  }).format(aNumber / 100);
+}
+
 function amountFor(aPerformance: Performance) {
   let result = 0;
   switch (playFor(aPerformance).type) {
@@ -56,16 +64,23 @@ function volumeCreditsFor(aPerformance: Performance) {
   return results;
 }
 
-function usd(aNumber: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumIntegerDigits: 2,
-  }).format(aNumber / 100);
+function totalVolumeCredits(invoice: Invoice) {
+  let result = 0;
+  for (let perf of invoice.performances) {
+    result += volumeCreditsFor(perf);
+  }
+  return result;
+}
+
+function totalAmount(invoice: Invoice) {
+  let result = 0;
+  for (let perf of invoice.performances) {
+    result += amountFor(perf);
+  }
+  return result;
 }
 
 export function statement(invoice: Invoice) {
-  let totalAmount = 0;
   let result = `Statement for ${invoice.customer}\n`;
 
   for (let perf of invoice.performances) {
@@ -73,19 +88,10 @@ export function statement(invoice: Invoice) {
     result += `${playFor(perf).name}: ${usd(amountFor(perf))} (${
       perf.audience
     } seats)\n`;
-    totalAmount += amountFor(perf);
   }
 
-  function totalVolumeCredits() {
-    let volumeCredits = 0;
-    for (let perf of invoice.performances) {
-      volumeCredits += volumeCreditsFor(perf);
-    }
-    return volumeCredits;
-  }
-  let volumeCredits = totalVolumeCredits();
-  result += `Amount owed is ${usd(totalAmount)}\n`;
-  result += `You earned ${volumeCredits} credits\n`;
+  result += `Amount owed is ${usd(totalAmount(invoice))}\n`;
+  result += `You earned ${totalVolumeCredits(invoice)} credits\n`;
   return result;
 }
 // for (let invoice of invoicesJson) {
