@@ -1,6 +1,6 @@
 import invoices from "./invoices.json";
 import plays from "./plays.json";
-import { output } from "./desiredOutput.json";
+import { output } from "./desired-output.json";
 import { statement } from "./index";
 
 test("Statement output", () => {
