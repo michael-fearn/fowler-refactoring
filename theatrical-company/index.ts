@@ -13,7 +13,7 @@ type Plays = {
   };
 };
 
-function statement(invoice: Invoice, plays: Plays) {
+export function statement(invoice: Invoice, plays: Plays) {
   let totalAmount = 0;
   let volumeCredits = 0;
   let result = `Statement for ${invoice.customer}\n`;
@@ -59,7 +59,7 @@ function statement(invoice: Invoice, plays: Plays) {
   result += `You earned ${volumeCredits} credits\n`;
   return result;
 }
+// for (let invoice of invoicesJson) {
+//   console.log(statement(invoice, playsJson));
 
-for (let invoice of invoicesJson) {
-  console.log(statement(invoice, playsJson));
-}
+// }
