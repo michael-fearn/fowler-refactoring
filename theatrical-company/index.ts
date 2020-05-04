@@ -47,14 +47,15 @@ function playFor(aPerformance: Performance) {
 }
 
 function volumeCreditsFor(aPerformance: Performance) {
-  let volumeCredits = 0;
-  volumeCredits += Math.max(aPerformance.audience - 30, 0);
+  let results = 0;
+  results += Math.max(aPerformance.audience - 30, 0);
   // add extra credit for every ten comedy attendees
   if ("comedy" === playFor(aPerformance).type)
-    volumeCredits += Math.floor(aPerformance.audience / 5);
+    results += Math.floor(aPerformance.audience / 5);
 
-  return volumeCredits;
+  return results;
 }
+
 
 export function statement(invoice: Invoice, plays: Plays) {
   let totalAmount = 0;
