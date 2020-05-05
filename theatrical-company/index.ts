@@ -2,7 +2,12 @@ import invoicesRaw from "./invoices.json";
 import playsRaw from "./plays.json";
 
 type Performance = { playID: string; audience: number };
-type EnrichedPerformance = { playID: string; audience: number; play: Play };
+type EnrichedPerformance = {
+  playID: string;
+  audience: number;
+  play: Play;
+  amount: number;
+};
 type Invoice = {
   customer: string;
   performances: Performance[];
@@ -27,16 +32,37 @@ export function statement(invoice: Invoice, plays: Plays) {
   return renderPlainText(statementData, invoice, plays);
 }
 
-function enrichPerformance(aPerformance: Performance) {
-  const result: EnrichedPerformance = Object.assign({}, aPerformance, {
-    play: playFor(aPerformance),
-  });
-
+function enrichPerformance(aPerformance: Performance): EnrichedPerformance {
+  const result: any = Object.assign({}, aPerformance);
+  result.play = playFor(aPerformance);
+  result.amount = amountFor(result);
   return result;
 }
 
 function playFor(aPerformance: Performance) {
   return plays[aPerformance.playID];
+}
+
+function amountFor(aPerformance: EnrichedPerformance) {
+  let result = 0;
+  switch (aPerformance.play.type) {
+    case "tragedy":
+      result = 40000;
+      if (aPerformance.audience > 30) {
+        result += 1000 * (aPerformance.audience - 30);
+      }
+      break;
+    case "comedy":
+      result = 30000;
+      if (aPerformance.audience > 20) {
+        result += 10000 + 500 * (aPerformance.audience - 20);
+      }
+      result += 300 * aPerformance.audience;
+      break;
+    default:
+      throw new Error(`unknown type: ${aPerformance.play.type}`);
+  }
+  return result;
 }
 
 function renderPlainText(data: any, invoice: Invoice, plays: Plays) {
@@ -59,28 +85,6 @@ function renderPlainText(data: any, invoice: Invoice, plays: Plays) {
       currency: "USD",
       minimumIntegerDigits: 2,
     }).format(aNumber / 100);
-  }
-
-  function amountFor(aPerformance: EnrichedPerformance) {
-    let result = 0;
-    switch (aPerformance.play.type) {
-      case "tragedy":
-        result = 40000;
-        if (aPerformance.audience > 30) {
-          result += 1000 * (aPerformance.audience - 30);
-        }
-        break;
-      case "comedy":
-        result = 30000;
-        if (aPerformance.audience > 20) {
-          result += 10000 + 500 * (aPerformance.audience - 20);
-        }
-        result += 300 * aPerformance.audience;
-        break;
-      default:
-        throw new Error(`unknown type: ${aPerformance.play.type}`);
-    }
-    return result;
   }
 
   function volumeCreditsFor(aPerformance: EnrichedPerformance) {
