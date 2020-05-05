@@ -20,8 +20,15 @@ type Plays = {
 const invoices = invoicesRaw as Invoice[];
 const plays = playsRaw as Plays;
 
-export function statement(invoice: Invoice) {
-  let result = `Statement for ${invoice.customer}\n`;
+export function statement(invoice: Invoice, plays: Plays) {
+  const statementData: any = {};
+  statementData.customer = invoice.customer;
+
+  return renderPlainText(statementData, invoice, plays);
+}
+
+function renderPlainText(data: any, invoice: Invoice, plays: Plays) {
+  let result = `Statement for ${data.customer}\n`;
 
   for (let perf of invoice.performances) {
     // print line for order
