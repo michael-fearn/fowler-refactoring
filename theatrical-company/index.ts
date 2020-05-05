@@ -2,7 +2,7 @@ import invoicesRaw from "./invoices.json";
 import playsRaw from "./plays.json";
 
 type Performance = { playID: string; audience: number };
-
+type EnrichedPerformance = { playID: string; audience: number; play: Play };
 type Invoice = {
   customer: string;
   performances: Performance[];
@@ -23,8 +23,20 @@ const plays = playsRaw as Plays;
 export function statement(invoice: Invoice, plays: Plays) {
   const statementData: any = {};
   statementData.customer = invoice.customer;
-  statementData.performances = invoice.performances
+  statementData.performances = invoice.performances.map(enrichPerformance);
   return renderPlainText(statementData, invoice, plays);
+}
+
+function enrichPerformance(aPerformance: Performance) {
+  const result: EnrichedPerformance = Object.assign({}, aPerformance, {
+    play: playFor(aPerformance),
+  });
+
+  return result;
+}
+
+function playFor(aPerformance: Performance) {
+  return plays[aPerformance.playID];
 }
 
 function renderPlainText(data: any, invoice: Invoice, plays: Plays) {
@@ -32,7 +44,7 @@ function renderPlainText(data: any, invoice: Invoice, plays: Plays) {
 
   for (let perf of data.performances) {
     // print line for order
-    result += `${playFor(perf).name}: ${usd(amountFor(perf))} (${
+    result += `${perf.play.name}: ${usd(amountFor(perf))} (${
       perf.audience
     } seats)\n`;
   }
@@ -49,9 +61,9 @@ function renderPlainText(data: any, invoice: Invoice, plays: Plays) {
     }).format(aNumber / 100);
   }
 
-  function amountFor(aPerformance: Performance) {
+  function amountFor(aPerformance: EnrichedPerformance) {
     let result = 0;
-    switch (playFor(aPerformance).type) {
+    switch (aPerformance.play.type) {
       case "tragedy":
         result = 40000;
         if (aPerformance.audience > 30) {
@@ -66,20 +78,16 @@ function renderPlainText(data: any, invoice: Invoice, plays: Plays) {
         result += 300 * aPerformance.audience;
         break;
       default:
-        throw new Error(`unknown type: ${playFor(aPerformance).type}`);
+        throw new Error(`unknown type: ${aPerformance.play.type}`);
     }
     return result;
   }
 
-  function playFor(aPerformance: Performance) {
-    return plays[aPerformance.playID];
-  }
-
-  function volumeCreditsFor(aPerformance: Performance) {
+  function volumeCreditsFor(aPerformance: EnrichedPerformance) {
     let results = 0;
     results += Math.max(aPerformance.audience - 30, 0);
     // add extra credit for every ten comedy attendees
-    if ("comedy" === playFor(aPerformance).type)
+    if ("comedy" === aPerformance.play.type)
       results += Math.floor(aPerformance.audience / 5);
 
     return results;
