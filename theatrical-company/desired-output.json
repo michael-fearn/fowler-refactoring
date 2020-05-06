@@ -1,1 +1,4 @@
-{"output":"Statement for BigCo\nHamlet: $650.00 (55 seats)\nAs You Like It: $580.00 (35 seats)\nOthello: $500.00 (40 seats)\nAmount owed is $1,730.00\nYou earned 47 credits\n"}
+{
+  "text": "Statement for BigCo\nHamlet: $650.00 (55 seats)\nAs You Like It: $580.00 (35 seats)\nOthello: $500.00 (40 seats)\nAmount owed is $1,730.00\nYou earned 47 credits\n",
+  "html": "<h1>Statement for BigCo</h1>\n<table>\n<tr><th>play</th><th>seats</th><th>cost</th></tr>\n<tr><td>Hamlet</td><td>55</td><td>$650.00</td></tr><tr><td>As You Like It</td><td>35</td><td>$580.00</td></tr><tr><td>Othello</td><td>40</td><td>$500.00</td></tr></table>\n<p>Amount owed is <em>$1,730.00</em></p><p>You earned <em>47</em></p>"
+}
