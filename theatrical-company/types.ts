@@ -20,7 +20,7 @@ export type Invoice = {
   performances: Performance[];
 };
 
-type Play = {
+export type Play = {
   name: string;
   type: string;
 };
