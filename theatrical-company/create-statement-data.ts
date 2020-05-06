@@ -7,36 +7,16 @@ import {
   EnrichedPerformance,
 } from "./types";
 
-class PerformanceCalculator {
-  private performance: Performance;
+abstract class PerformanceCalculator {
+  public performance: Performance;
   public play: Play;
 
   constructor(performance: Performance, play: Play) {
     this.performance = performance;
     this.play = play;
   }
-
-  get amount() {
-    let result = 0;
-    switch (this.play.type) {
-      case "tragedy":
-        result = 40000;
-        if (this.performance.audience > 30) {
-          result += 1000 * (this.performance.audience - 30);
-        }
-        break;
-      case "comedy":
-        result = 30000;
-        if (this.performance.audience > 20) {
-          result += 10000 + 500 * (this.performance.audience - 20);
-        }
-        result += 300 * this.performance.audience;
-        break;
-      default:
-        throw new Error(`unknown type: ${this.play.type}`);
-    }
-    return result;
-  }
+  
+  abstract get amount(): number;
 
   get volumeCredits() {
     let results = 0;
@@ -49,8 +29,25 @@ class PerformanceCalculator {
   }
 }
 
-class TragedyCalculator extends PerformanceCalculator {}
-class ComedyCalculator extends PerformanceCalculator {}
+class TragedyCalculator extends PerformanceCalculator {
+  get amount() {
+    let result = 40000;
+    if (this.performance.audience > 30) {
+      result += 1000 * (this.performance.audience - 30);
+    }
+    return result;
+  }
+}
+class ComedyCalculator extends PerformanceCalculator {
+  get amount() {
+    let result = 30000;
+    if (this.performance.audience > 20) {
+      result += 10000 + 500 * (this.performance.audience - 20);
+    }
+    result += 300 * this.performance.audience;
+    return result;
+  }
+}
 
 function createPerformanceCalculator(performance: Performance, play: Play) {
   switch (play.type) {
