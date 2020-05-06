@@ -49,6 +49,20 @@ class PerformanceCalculator {
   }
 }
 
+class TragedyCalculator extends PerformanceCalculator {}
+class ComedyCalculator extends PerformanceCalculator {}
+
+function createPerformanceCalculator(performance: Performance, play: Play) {
+  switch (play.type) {
+    case "tragedy":
+      return new TragedyCalculator(performance, play);
+    case "comedy":
+      return new ComedyCalculator(performance, play);
+    default:
+      throw new Error(`unknown type: ${play.type}`);
+  }
+}
+
 export function createStatementData(invoice: Invoice, plays: Plays) {
   const statementData: any = {};
   statementData.customer = invoice.customer;
@@ -69,7 +83,7 @@ export function createStatementData(invoice: Invoice, plays: Plays) {
   }
 
   function enrichPerformance(aPerformance: Performance): EnrichedPerformance {
-    const calculator = new PerformanceCalculator(
+    const calculator = createPerformanceCalculator(
       aPerformance,
       playFor(aPerformance)
     );
