@@ -2,12 +2,19 @@ import invoicesRaw from "./invoices.json";
 import playsRaw from "./plays.json";
 
 type Performance = { playID: string; audience: number };
+
 type EnrichedPerformance = {
   playID: string;
   audience: number;
   play: Play;
   amount: number;
 };
+
+type StatementData = {
+  customer: string;
+  performances: EnrichedPerformance[];
+};
+
 type Invoice = {
   customer: string;
   performances: Performance[];
@@ -65,12 +72,12 @@ function amountFor(aPerformance: EnrichedPerformance) {
   return result;
 }
 
-function renderPlainText(data: any, invoice: Invoice, plays: Plays) {
+function renderPlainText(data: StatementData, invoice: Invoice, plays: Plays) {
   let result = `Statement for ${data.customer}\n`;
 
   for (let perf of data.performances) {
     // print line for order
-    result += `${perf.play.name}: ${usd(amountFor(perf))} (${
+    result += `${perf.play.name}: ${usd(perf.amount)} (${
       perf.audience
     } seats)\n`;
   }
@@ -108,7 +115,7 @@ function renderPlainText(data: any, invoice: Invoice, plays: Plays) {
   function totalAmount() {
     let result = 0;
     for (let perf of data.performances) {
-      result += amountFor(perf);
+      result += perf.amount;
     }
     return result;
   }
