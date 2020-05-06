@@ -10,6 +10,7 @@ import {
 class PerformanceCalculator {
   private performance: Performance;
   public play: Play;
+
   constructor(performance: Performance, play: Play) {
     this.performance = performance;
     this.play = play;
@@ -35,6 +36,16 @@ class PerformanceCalculator {
         throw new Error(`unknown type: ${this.play.type}`);
     }
     return result;
+  }
+
+  get volumeCredits() {
+    let results = 0;
+    results += Math.max(this.performance.audience - 30, 0);
+    // add extra credit for every ten comedy attendees
+    if ("comedy" === this.play.type)
+      results += Math.floor(this.performance.audience / 5);
+
+    return results;
   }
 }
 
@@ -65,20 +76,9 @@ export function createStatementData(invoice: Invoice, plays: Plays) {
     const result: any = Object.assign({}, aPerformance);
     result.play = calculator.play;
     result.amount = calculator.amount;
-    result.volumeCredits = volumeCreditsFor(result);
+    result.volumeCredits = calculator.volumeCredits;
     return result;
   }
-
-  function volumeCreditsFor(aPerformance: EnrichedPerformance) {
-    let results = 0;
-    results += Math.max(aPerformance.audience - 30, 0);
-    // add extra credit for every ten comedy attendees
-    if ("comedy" === aPerformance.play.type)
-      results += Math.floor(aPerformance.audience / 5);
-
-    return results;
-  }
-
   function playFor(aPerformance: Performance) {
     return plays[aPerformance.playID];
   }
