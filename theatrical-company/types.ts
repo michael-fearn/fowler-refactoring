@@ -1,19 +1,6 @@
+import { PerformanceCalculator } from "./create-statement-data";
+
 export type Performance = { playID: string; audience: number };
-
-export type EnrichedPerformance = {
-  playID: string;
-  audience: number;
-  play: Play;
-  amount: number;
-  volumeCredits: number;
-};
-
-export type StatementData = {
-  customer: string;
-  performances: EnrichedPerformance[];
-  totalAmount: number;
-  totalVolumeCredits: number;
-};
 
 export type Invoice = {
   customer: string;
@@ -27,4 +14,11 @@ export type Play = {
 
 export type Plays = {
   [key: string]: Play;
+};
+
+export type StatementData = {
+  customer: string;
+  performances: PerformanceCalculator[];
+  totalAmount: number;
+  totalVolumeCredits: number;
 };

@@ -1,33 +1,28 @@
-import {
-  Invoice,
-  Plays,
-  Play,
-  StatementData,
-  Performance,
-  EnrichedPerformance,
-} from "./types";
+import { Invoice, Plays, Play, StatementData, Performance } from "./types";
 
-abstract class PerformanceCalculator {
+export abstract class PerformanceCalculator {
   public performance: Performance;
+  public audience: number;
   public play: Play;
 
   constructor(performance: Performance, play: Play) {
     this.performance = performance;
+    this.audience = performance.audience;
     this.play = play;
   }
 
   abstract get amount(): number;
 
   get volumeCredits() {
-    return Math.max(this.performance.audience - 30, 0);
+    return Math.max(this.audience - 30, 0);
   }
 }
 
 class TragedyCalculator extends PerformanceCalculator {
   get amount() {
     let result = 40000;
-    if (this.performance.audience > 30) {
-      result += 1000 * (this.performance.audience - 30);
+    if (this.audience > 30) {
+      result += 1000 * (this.audience - 30);
     }
     return result;
   }
@@ -35,14 +30,14 @@ class TragedyCalculator extends PerformanceCalculator {
 class ComedyCalculator extends PerformanceCalculator {
   get amount() {
     let result = 30000;
-    if (this.performance.audience > 20) {
-      result += 10000 + 500 * (this.performance.audience - 20);
+    if (this.audience > 20) {
+      result += 10000 + 500 * (this.audience - 20);
     }
-    result += 300 * this.performance.audience;
+    result += 300 * this.audience;
     return result;
   }
   get volumeCredits() {
-    return super.volumeCredits + Math.floor(this.performance.audience / 5);
+    return super.volumeCredits + Math.floor(this.audience / 5);
   }
 }
 
@@ -57,36 +52,26 @@ function createPerformanceCalculator(performance: Performance, play: Play) {
   }
 }
 
-export function createStatementData(invoice: Invoice, plays: Plays) {
-  const statementData: any = {};
-  statementData.customer = invoice.customer;
-  statementData.performances = invoice.performances.map(enrichPerformance);
-  statementData.totalAmount = totalAmount(statementData);
-  statementData.totalVolumeCredits = totalVolumeCredits(statementData);
-  return statementData;
-
-  function totalVolumeCredits(data: StatementData) {
-    return data.performances.reduce(
-      (total, p) => (total += p.volumeCredits),
+export function createStatementData(
+  invoice: Invoice,
+  plays: Plays
+): StatementData {
+  const performances = invoice.performances.map(enrichPerformance);
+  return {
+    performances,
+    customer: invoice.customer,
+    totalVolumeCredits: performances.reduce(
+      (t, p) => (t += p.volumeCredits),
       0
-    );
+    ),
+
+    totalAmount: performances.reduce((t, p) => (t += p.amount), 0),
+  };
+
+  function enrichPerformance(aPerformance: Performance): PerformanceCalculator {
+    return createPerformanceCalculator(aPerformance, playFor(aPerformance));
   }
 
-  function totalAmount(data: StatementData) {
-    return data.performances.reduce((total, p) => (total += p.amount), 0);
-  }
-
-  function enrichPerformance(aPerformance: Performance): EnrichedPerformance {
-    const calculator = createPerformanceCalculator(
-      aPerformance,
-      playFor(aPerformance)
-    );
-    const result: any = Object.assign({}, aPerformance);
-    result.play = calculator.play;
-    result.amount = calculator.amount;
-    result.volumeCredits = calculator.volumeCredits;
-    return result;
-  }
   function playFor(aPerformance: Performance) {
     return plays[aPerformance.playID];
   }

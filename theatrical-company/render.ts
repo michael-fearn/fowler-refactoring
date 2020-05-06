@@ -7,7 +7,6 @@ export function statement(invoice: Invoice, plays: Plays) {
 
 function renderPlainText(data: StatementData) {
   let result = `Statement for ${data.customer}\n`;
-
   for (let perf of data.performances) {
     result += `${perf.play.name}: ${usd(perf.amount)} (${
       perf.audience
